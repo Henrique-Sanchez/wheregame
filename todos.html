@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhereGame - Todos os Jogos</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    #busca {
+      padding: 8px;
+      width: 50%;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .mensagem-erro {
+      color: red;
+      font-weight: bold;
+    }
+    .jogo {
+      margin-bottom: 20px;
+    }
+    img {
+      width: 250px;
+      border-radius: 8px;
+      margin: 8px 0;
+    }
+    a {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>WhereGame</h1>
+    <p>Sua Próxima Aventura Começa Aqui!</p>
+  </header>
+  <nav>
+    <a href="index.html">Promoções</a>
+    <a href="todos.html">Todos os Jogos</a>
+    <a href="sobre.html">Sobre</a>
+  </nav>
+  <main>
+    <h2>Buscar Jogo</h2>
+    <input type="text" id="busca" placeholder="Digite o nome do jogo...">
+    <div id="ofertas"></div>
+  </main>
+
+  <script>
+    function renderizarJogos(jogos) {
+      const container = document.getElementById('ofertas');
+      container.innerHTML = '';
+
+      if (jogos.length === 0) {
+        container.innerHTML = '<p class="mensagem-erro">Nenhum jogo encontrado 😢</p>';
+        return;
+      }
+
+      jogos.forEach(jogo => {
+        const div = document.createElement('div');
+        div.classList.add('jogo');
+        div.innerHTML = `
+          <h3>${jogo.titulo}</h3>
+          <img src="${jogo.imagem}" alt="${jogo.titulo}" style="width:100%;max-width:400px;">
+          <p>${jogo.preco}</p>
+          ${jogo.notaSteam ? `<p><strong>Avaliação Steam:</strong> ${jogo.notaSteam.split('<br>')[0]}</p>` : ''}
+          ${jogo.notaMetacritic ? `<p><strong>Metacritic:</strong> ${jogo.notaMetacritic}</p>` : ''}
+          <a href="${jogo.link}" target="_blank">Ver na Steam</a>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById('busca').addEventListener('input', () => {
+      const termo = document.getElementById('busca').value.trim();
+      if (termo.length < 2) {
+        document.getElementById('ofertas').innerHTML = '';
+        return;
+      }
+
+      fetch(`http://localhost:3000/api/jogos?q=${encodeURIComponent(termo)}`)
+        .then(res => res.json())
+        .then(data => renderizarJogos(data))
+        .catch(() => {
+          document.getElementById('ofertas').innerHTML = '<p class="mensagem-erro">Erro ao buscar jogos</p>';
+        });
+    });
+  </script>
+
+  <footer>&copy; 2025 WhereGame</footer>
+</body>
+</html>
