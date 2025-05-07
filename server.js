@@ -8,7 +8,10 @@ app.use(cors());
 
 // Função genérica para extrair resultados da Steam com Puppeteer
 async function extrairResultados(url, incluirNotas = false) {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
   
     // Simular cabeçalhos de navegador real
