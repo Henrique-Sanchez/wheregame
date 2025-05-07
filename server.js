@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer');
 const cors = require('cors');
 
 const app = express();
+app.use(express.static('public'));
 app.use(cors());
 
 // Função genérica para extrair resultados da Steam com Puppeteer
