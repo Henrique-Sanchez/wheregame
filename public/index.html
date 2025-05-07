@@ -1,1 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhereGame - Promoções</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    #busca, #filtro {
+      padding: 8px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .jogo {
+      margin-bottom: 20px;
+    }
+    .mensagem-erro {
+      color: red;
+      font-weight: bold;
+    }
+    img {
+      width: 250px;
+      border-radius: 8px;
+      margin: 8px 0;
+    }
+    a {
+        color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>WhereGame</h1>
+    <p>Sua Próxima Aventura Começa Aqui!</p>
+  </header>
+  <nav>
+    <a href="index.html">Promoções</a>
+    <a href="todos.html">Todos os Jogos</a>
+    <a href="sobre.html">Sobre</a>
+</nav>
+  <main>
+    <h2>Ofertas Recentes</h2>
+    <input type="text" id="busca" placeholder="Buscar jogo...">
+    <select id="filtro">
+      <option value="">Relevância</option>
+      <option value="menor">Menor preço</option>
+      <option value="maior">Maior preço</option>
+    </select>
+    <div id="ofertas"></div>
+  </main>
 
+  <script>
+    let todasOfertas = [];
+
+    function precoParaNumero(preco) {
+      return parseFloat(preco.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+    }
+
+    function renderizarOfertas(ofertas) {
+      const container = document.getElementById('ofertas');
+      container.innerHTML = '';
+
+      if (ofertas.length === 0) {
+        container.innerHTML = '<p class="mensagem-erro">Nenhum jogo encontrado 😢</p>';
+        return;
+      }
+
+      ofertas.forEach(oferta => {
+        const div = document.createElement('div');
+        div.classList.add('jogo');
+        div.innerHTML = `
+          <h3>${oferta.titulo}</h3>
+          <img src="${oferta.imagem}" alt="${oferta.titulo}" style="width:100%;max-width:400px;">
+          <p>${oferta.preco}</p>
+          ${oferta.notaSteam ? `<p><strong>Avaliação Steam:</strong> ${oferta.notaSteam.split('<br>')[0]}</p>` : ''}
+                ${oferta.notaMetacritic ? `<p><strong>Metacritic:</strong> ${oferta.notaMetacritic}</p>` : ''}
+          <a href="${oferta.link}" target="_blank">Ver na Steam</a>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function aplicarFiltros() {
+      const termo = document.getElementById('busca').value.toLowerCase();
+      const ordem = document.getElementById('filtro').value;
+
+      let filtradas = todasOfertas.filter(oferta =>
+        oferta.titulo.toLowerCase().includes(termo)
+      );
+
+      if (ordem === 'menor') {
+        filtradas.sort((a, b) => precoParaNumero(a.preco) - precoParaNumero(b.preco));
+      } else if (ordem === 'maior') {
+        filtradas.sort((a, b) => precoParaNumero(b.preco) - precoParaNumero(a.preco));
+      }
+
+      renderizarOfertas(filtradas);
+    }
+
+    fetch('http://localhost:3000/api/ofertas')
+      .then(res => res.json())
+      .then(data => {
+        todasOfertas = data;
+        aplicarFiltros();
+      });
+
+    document.getElementById('busca').addEventListener('input', aplicarFiltros);
+    document.getElementById('filtro').addEventListener('change', aplicarFiltros);
+  </script>
+
+  <footer>&copy; 2025 WhereGame</footer>
+</body>
+</html>
