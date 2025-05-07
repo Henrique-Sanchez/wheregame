@@ -13,7 +13,7 @@
     "axios": "^1.9.0",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
     "puppeteer": "^21.3.8"
   }
 }
